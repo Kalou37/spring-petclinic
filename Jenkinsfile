@@ -19,11 +19,10 @@ pipeline {
             }
 
             post {
-
                 // If Maven was able to run the tests, even if some of the test
                 // failed, record the test results and archive the jar file.
                 success {
-                    archiveArtifacts artifacts: 'target/spring-petclinic-2.3.1.BUILD-SNAPSHOT.jar', followSymlinks: false
+                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
                 }
                 failure {
                     mail bcc: '', body: 'Tout est dans le titre', cc: '', from: '', replyTo: '', subject: 'Echec du build de la dernière version de PetClinic', to: 'p_roussel@hotmail.fr'
@@ -35,10 +34,14 @@ pipeline {
             steps {
                 sh label: '', script: '''sudo service petclinic stop
                 rm -i -f /home/vagrant/petclinic/*.jar'''
-                copyArtifacts filter: 'target/*.jar',
-                flatten: true, projectName: 'PetClinic_Build',
-                selector: lastSuccessful(),
-                target: '/home/vagrant/petclinic/'
+                step([  $class: 'CopyArtifact',
+                        filter: '**/target/*.jar',
+                        flatten: true,
+                        fingerprintArtifacts: true,
+                        projectName: '${JOB_NAME}',
+                        selector: lastSuccessful(),
+                        target: '/home/vagrant/petclinic/'
+                ])
                 sh label: '', script: '''mv /home/vagrant/petclinic/*.jar /home/vagrant/petclinic/petclinic.jar
                 sudo chmod 777 /home/vagrant/petclinic/petclinic.jar
                 sudo service petclinic start'''
