@@ -62,6 +62,10 @@ public class Owner extends Person {
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
 	private Set<Pet> pets;
 
+	/**
+	 * Return the address of the Owner.
+	 * @return the address as String type
+	 */
 	public String getAddress() {
 		return this.address;
 	}
@@ -70,6 +74,10 @@ public class Owner extends Person {
 		this.address = address;
 	}
 
+	/**
+	 * Return the city of the Owner.
+	 * @return the city as String type
+	 */
 	public String getCity() {
 		return this.city;
 	}
@@ -78,6 +86,10 @@ public class Owner extends Person {
 		this.city = city;
 	}
 
+	/**
+	 * Return the telephone of the Owner.
+	 * @return the telephone as String type
+	 */
 	public String getTelephone() {
 		return this.telephone;
 	}
@@ -86,6 +98,11 @@ public class Owner extends Person {
 		this.telephone = telephone;
 	}
 
+	/**
+	 * Return the list of pets of the Owner.
+	 * @return the list as Set<Pet> type
+	 * this method is protected
+	 */
 	protected Set<Pet> getPetsInternal() {
 		if (this.pets == null) {
 			this.pets = new HashSet<>();
@@ -97,6 +114,10 @@ public class Owner extends Person {
 		this.pets = pets;
 	}
 
+	/**
+	 * Return the list of pets of the Owner.
+	 * @return the list as List<Pet> type
+	 */
 	public List<Pet> getPets() {
 		List<Pet> sortedPets = new ArrayList<>(getPetsInternal());
 		PropertyComparator.sort(sortedPets, new MutableSortDefinition("name", true, true));
