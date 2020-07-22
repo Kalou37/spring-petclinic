@@ -2,49 +2,69 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage("Checkout SCM") {
             steps {
+                echo "Check Jenkinsfile into repository..."
                 // Get some code from a GitHub repository
                 checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    doGenerateSubmoduleConfigurations: false,
-                    extensions: [[$class: 'CheckoutOption', timeout: 5]],
-                    submoduleCfg: [],
-                    userRemoteConfigs: [[url: 'https://github.com/Kalou37/spring-petclinic.git']]
-                    ])
-
-                // Run Maven on a Unix agent.
-                sh "mvn clean package"
+                $class: 'GitSCM',
+                branches: [[name: '*/main']],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [[$class: 'CheckoutOption', timeout: 5]],
+                submoduleCfg: [],
+                userRemoteConfigs: [[url: 'https://github.com/Kalou37/spring-petclinic.git']]
+                ])
             }
 
             post {
-                // If Maven was able to run the tests, even if some of the test
-                // failed, record the test results and archive the jar file.
-                success {
-                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
-                }
                 failure {
-                    mail bcc: '', body: 'Tout est dans le titre', cc: '', from: '', replyTo: '', subject: 'Echec du build de la dernière version de PetClinic', to: 'p_roussel@hotmail.fr'
+                    echo "Error checking SCM..."
+                    error('Aborting the pipeline.')
                 }
             }
         }
 
-        stage('Restart') {
+        stage('Build Package') {
             steps {
-                sh label: '', script: '''sudo service petclinic stop
-                rm -i -f /home/vagrant/petclinic/*.jar'''
-                step([  $class: 'CopyArtifact',
-                        filter: '**/target/*.jar',
-                        flatten: true,
-                        fingerprintArtifacts: true,
-                        projectName: '${JOB_NAME}',
-                        selector: lastSuccessful(),
-                        target: '/home/vagrant/petclinic/'
-                ])
-                sh label: '', script: '''mv /home/vagrant/petclinic/*.jar /home/vagrant/petclinic/petclinic.jar
-                sudo chmod 777 /home/vagrant/petclinic/petclinic.jar
-                sudo service petclinic start'''
+                echo "Start to build the JAR package..."
+                sh "mvn clean package"
+            }
+
+            post {
+                success {
+                    echo "Build successful !"
+                    archiveArtifacts artifacts: 'target/spring-petclinic-*.jar', followSymlinks: false
+                }
+                failure {
+                    mail bcc: '', body: 'Tout est dans le titre', cc: '', from: '', replyTo: '', subject: 'Echec du build de la dernière version de PetClinic', to: 'p_roussel@hotmail.fr'
+                    echo "Build failed..."
+                    error('Aborting the pipeline.')
+                }
+            }
+        }
+
+        stage('Backup JAR') {
+            steps {
+                echo "Backup JAR in directory"
+                sh label: '', script: '''mv -i -f /home/vagrant/petclinic/*.jar /home/vagrant/petclinic/petclinic.jar.bak'''
+            }
+        }
+
+        stage('CopyPackage') {
+            steps {
+                echo "Copy and rename new package..."
+                sh label: '', script: '''mv target/spring-petclinic-*.jar /home/vagrant/petclinic/petclinic.jar'''
+                echo "Copy successful, delete old package..."
+                sh label: '', script: '''rm -i -f /home/vagrant/petclinic/*.bak'''
+                echo "Change right to package..."
+                sh label: '', script: '''sudo chmod 777 /home/vagrant/petclinic/petclinic.jar'''
+            }
+        }
+
+        stage('RestartService') {
+            steps {
+                echo "Restart PetClinin service..."
+                sh label: '', script: '''sudo service petclinic restart'''
             }
         }
     }
