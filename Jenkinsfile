@@ -6,13 +6,6 @@ pipeline {
             steps {
                 checkout SCM
             }
-
-            post {
-                failure {
-                    echo "### Error checking SCM..."
-                    error('Aborting the pipeline.')
-                }
-            }
         }
 
         stage('Build Package') {
