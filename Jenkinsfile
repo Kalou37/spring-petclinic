@@ -30,7 +30,7 @@ pipeline {
             steps {
                 echo "### Delete old image docker..."
                 sh label: 'DeleteImageDocker', script: '''docker rm -f petclinic-container'''
-                sh label: 'DeleteImageDocker', script: '''docker rmi -f petclinic'''
+                sh label: 'DeleteImageDocker', script: '''docker rmi -f petclinic-image'''
                 echo "### Create new image docker..."
                 sh label: 'CreateImageDocker', script: '''docker build -t petclinic /home/vagrant/data/spring-petclinic'''
                 echo "### Run image docker..."

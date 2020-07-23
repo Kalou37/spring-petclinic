@@ -26,6 +26,8 @@ import javax.persistence.MappedSuperclass;
  * Simple JavaBean domain object with an id property. Used as a base class for objects
  * needing this property.
  *
+ * This line is useless !
+ *
  * @author Ken Krebs
  * @author Juergen Hoeller
  */
