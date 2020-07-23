@@ -11,7 +11,7 @@ VOLUME /tmp
 EXPOSE 9090
 
 # The application's jar file
-ARG JAR_FILE=jar/petclinic.jar
+ARG JAR_FILE=target/*.jar
 
 # Add the application's jar to the container
 ADD ${JAR_FILE} petclinic.jar
