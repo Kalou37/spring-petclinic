@@ -35,3 +35,17 @@ CMD ["java", "-jar", "/petclinic.jar"]
 #
 ## Run the jar file
 #ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/petclinic.jar"]
+
+# sudo systemctl stop mysql.service
+# docker-compose -f /home/vagrant/data/spring-petclinic/docker-compose.yml up -d
+# application.properties est configuré pour mysql, donc commande ci-dessous inutile ?
+# docker exec -i springpetclinic_mysql_1 mysql -uroot petclinic </home/vagrant/data/spring-petclinic/src/main/resources/db/mysql/user.sql
+# docker exec -i springpetclinic_mysql_1 mysql -uroot petclinic </home/vagrant/data/spring-petclinic/src/main/resources/db/mysql/schema.sql
+# docker exec -i springpetclinic_mysql_1 mysql -uroot petclinic </home/vagrant/data/spring-petclinic/src/main/resources/db/mysql/data.sql
+
+# docker build -t petclinic-image /home/vagrant/data/spring-petclinic/.
+
+# docker run -d -t --link springpetclinic_mysql_1:mysql -p 5000:9090 --name petclinic-container petclinic-image
+
+
+# docker exec -it springpetclinic_mysql_1 bash; # Commande pour éxécuter mysql dans docker

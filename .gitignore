@@ -14,3 +14,7 @@ target/*
 !.vscode/launch.json
 !.vscode/extensions.json
 _site/
+src/main/.DS_Store
+src/.DS_Store
+src/main/resources/.DS_Store
+.DS_Store
