@@ -10,14 +10,13 @@ pipeline {
 
         stage('Build Package') {
             steps {
-                echo "### Start to build the JAR package..."
-                sh "mvn -B jacoco:report checkstyle:checkstyle install"
+                echo "### Start to build the package..."
+                sh "mvn clean install"
             }
 
             post {
                 success {
                     echo "### Build successful !"
-                    archiveArtifacts artifacts: '**/target/spring-petclinic-*.jar', fingerprint: true
                 }
                 failure {
                     mail bcc: '', body: 'Tout est dans le titre', cc: '', from: '', replyTo: '', subject: 'Echec du build de la dernière version de PetClinic', to: 'p_roussel@hotmail.fr'
